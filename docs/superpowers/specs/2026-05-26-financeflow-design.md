@@ -6,7 +6,7 @@
 
 ## 1. What It Does
 
-A personal web app that takes bank or credit card statements (PDF or screenshot) and automatically extracts every transaction, lets you review and categorize each one, then writes the organized data into your spreadsheet — creating a new monthly tab each time.
+A personal web app that takes bank or credit card statements (PDF or CSV export) and automatically extracts every transaction, lets you review and categorize each one, then writes the organized data into your spreadsheet — creating a new monthly tab each time. Screenshot support is planned for Phase 2.
 
 ---
 
@@ -29,7 +29,7 @@ A personal web app that takes bank or credit card statements (PDF or screenshot)
 ### Frontend — Next.js (React)
 Runs in your browser. Three main screens:
 
-- **Upload** — Drag & drop a PDF or screenshot (PNG, JPG, HEIC). Shows import history with status.
+- **Upload** — Drag & drop a PDF or CSV file. Shows import history with status.
 - **Review** — Transaction-by-transaction approval. Each charge shows date, merchant, amount, and suggested category. Actions: ✓ Approve, ✎ Edit category, ✗ Skip.
 - **Spreadsheet View** — Monthly tab navigation, category summary banner, full transaction table.
 
@@ -37,9 +37,10 @@ Runs in your browser. Three main screens:
 Runs on your computer alongside the browser app. Handles all heavy lifting:
 
 - **PDF Extractor** — reads transaction data from bank/card statement PDFs (`pdfplumber`)
-- **Screenshot Reader** — OCR for image-based statements (`pytesseract` or similar)
+- **CSV Reader** — parses bank CSV exports using a per-bank column mapping config (`pandas`)
 - **Categorizer Module** — rule-based merchant matching (designed as a swappable interface for future AI upgrade)
 - **Spreadsheet Writer** — writes to `.xlsx` using `openpyxl`; optionally syncs to Google Sheets via Google Sheets API
+- **Screenshot Reader** *(Phase 2)* — OCR for image-based statements, plug-in ready
 
 ### No database needed
 All data lives in the spreadsheet. The app reads/writes the `.xlsx` file directly.
@@ -83,6 +84,11 @@ categorize(merchant_name: str) -> Category | None
 | Source | Which card/bank account |
 | Type | Income or Expense *(layout TBD)* |
 
+### Multi-Statement Handling (Same Month)
+- If a tab for that month already exists, new transactions are **appended** below existing rows
+- **Duplicate detection:** a transaction is considered a duplicate if date + amount + merchant name all match an existing row — it is skipped silently
+- The Source column tracks which card each row came from, keeping multiple imports clearly separated
+
 ### Summary Section
 Top of each tab — total spent, breakdown by category, count of uncategorized items.
 
@@ -90,10 +96,15 @@ Top of each tab — total spent, breakdown by category, count of uncategorized i
 
 ## 6. Supported Input Formats
 
-| Format | Method |
-|---|---|
-| PDF bank/card statement | `pdfplumber` text extraction |
-| PNG / JPG / HEIC screenshot | OCR (pytesseract or Claude Vision — TBD) |
+| Format | Method | Status |
+|---|---|---|
+| PDF bank/card statement | `pdfplumber` text extraction | ✅ Phase 1 |
+| CSV export from bank | `pandas` / built-in `csv` parser + bank column map | ✅ Phase 1 |
+| PNG / JPG / HEIC screenshot | OCR (pytesseract or Claude Vision) | ⏳ Phase 2 — future plug-in |
+
+The input handler is designed as a swappable module — each file type is its own reader that implements the same interface. Adding screenshot support later is a clean drop-in with no changes to the rest of the app.
+
+> **Note on CSV:** Most banks offer a CSV/Excel export of transactions (usually under "Download Activity" or "Export"). CSV is easier to parse than PDF since the data is already structured. The app includes a per-bank column mapping config to handle naming differences (e.g. Chase uses "Description", BofA uses "Payee Name", Capital One uses "Transaction Description"). Banks supported at launch: Chase, Bank of America, Capital One, Wells Fargo, American Express, Citi, Discover. Others can be added by adding a row to the config.
 
 ---
 
@@ -101,21 +112,39 @@ Top of each tab — total spent, breakdown by category, count of uncategorized i
 
 1. **User's existing spreadsheet template** — what columns exist, how are they laid out?
 2. **Income handling layout** — same table as expenses (with Type column) OR separate Income/Expense sections per tab?
-3. **Screenshot OCR method** — free local Tesseract vs. Claude Vision API (small cost, much more accurate)
+3. ~~**Screenshot OCR method**~~ — deferred to Phase 2
 
 ---
 
-## 8. Out of Scope (for now)
+## 8. Help & Tutorial Section
+
+A built-in Help screen inside the app with step-by-step guides on how to download a PDF statement from the most common banks:
+
+- Chase
+- Bank of America
+- Capital One
+- Wells Fargo
+- American Express
+- Citi
+- Discover
+- Generic guide for any other bank / credit union
+
+Each guide has numbered steps with visual cues and tips (e.g. billing cycle notes, where the file saves). A general tips section covers: always download PDF, file lands in Downloads folder, most banks keep 12–24 months of history.
+
+---
+
+## 9. Out of Scope (for now)
 
 - Multi-user / login system
 - Cloud hosting (runs locally only)
 - Budget alerts or notifications
 - Charts / graphs (can be added in spreadsheet manually)
 - AI categorization (Phase 2)
+- Screenshot / image OCR (Phase 2)
 
 ---
 
-## 9. Interactive Prototype
+## 10. Interactive Prototype
 
 A clickable HTML prototype was built during brainstorming. Located at:
 ```
