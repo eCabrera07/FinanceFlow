@@ -2,6 +2,7 @@ import io
 import json
 import os
 import tempfile
+from datetime import datetime
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from starlette.background import BackgroundTask
@@ -63,9 +64,9 @@ async def confirm_transactions(
 ):
     """Write approved transactions to the user's spreadsheet and return it as a download."""
     mapping = load_mapping()
-    if not mapping:
-        raise HTTPException(status_code=400,
-                            detail="No spreadsheet mapping found. Run the setup wizard first.")
+    # If no mapping, fall back to the default template layout (columns A–F,
+    # writing to the current month's tab e.g. "Jun 2026").
+    sheet_name = mapping["sheet_name"] if mapping else datetime.now().strftime("%b %Y")
 
     try:
         txs: list[dict] = json.loads(transactions)
@@ -80,7 +81,7 @@ async def confirm_transactions(
     try:
         write_transactions(
             file_path=tmp_path,
-            sheet_name=mapping["sheet_name"],
+            sheet_name=sheet_name,
             transactions=txs,
             mapping=mapping,
         )
