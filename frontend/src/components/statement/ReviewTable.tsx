@@ -126,7 +126,7 @@ export default function ReviewTable({ transactions, onDone }: Props) {
                   <select
                     value={row.tx.category}
                     onChange={(e) => updateCategory(i, e.target.value)}
-                    className="rounded border border-gray-200 px-2 py-1 text-sm"
+                    className="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>{cat}</option>
