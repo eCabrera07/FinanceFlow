@@ -10,13 +10,15 @@ def read_spreadsheet_structure(file_path: str) -> Dict[str, Dict[str, str]]:
         Only columns with non-empty headers are included.
     """
     wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
-    result = {}
-    for name in wb.sheetnames:
-        ws = wb[name]
-        headers = {}
-        for cell in ws[1]:
-            if cell.value is not None:
-                headers[cell.column_letter] = str(cell.value)
-        result[name] = headers
-    wb.close()
-    return result
+    try:
+        result = {}
+        for name in wb.sheetnames:
+            ws = wb[name]
+            headers = {}
+            for cell in ws[1]:
+                if cell.value is not None:
+                    headers[cell.column_letter] = str(cell.value)
+            result[name] = headers
+        return result
+    finally:
+        wb.close()
