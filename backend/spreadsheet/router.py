@@ -2,10 +2,13 @@ import os
 import tempfile
 from fastapi import APIRouter, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
+from typing import Dict, Optional
 
 from .template_service import get_template_path
 from .import_service import read_spreadsheet_structure
 from .column_matcher import match_columns
+from .mapping_service import save_mapping, load_mapping, reset_mapping
 
 router = APIRouter(prefix="/spreadsheet", tags=["spreadsheet"])
 
@@ -57,3 +60,31 @@ async def inspect_spreadsheet(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail=f"Could not read spreadsheet: {e}")
     finally:
         os.unlink(tmp_path)
+
+
+class MappingRequest(BaseModel):
+    file_path: str
+    sheet_name: str
+    start_row: str  # "auto" or integer as string
+    columns: Dict[str, Optional[str]]
+
+
+@router.post("/mapping")
+def save_column_mapping(body: MappingRequest):
+    """Save the user's column mapping for future imports."""
+    save_mapping(body.model_dump())
+    return {"status": "saved"}
+
+
+@router.get("/mapping")
+def get_column_mapping():
+    """Return the current saved mapping, or null if none exists."""
+    mapping = load_mapping()
+    return {"mapping": mapping}
+
+
+@router.delete("/mapping")
+def delete_column_mapping():
+    """Clear the saved mapping — next import will re-run the wizard."""
+    reset_mapping()
+    return {"status": "reset"}
