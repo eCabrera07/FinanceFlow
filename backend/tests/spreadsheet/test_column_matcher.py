@@ -39,3 +39,18 @@ def test_unmatched_fields_return_none():
 def test_empty_headers_return_all_none():
     result = match_columns({})
     assert all(v is None for v in result.values())
+
+
+def test_matches_source_header():
+    result = match_columns({"A": "Source"})
+    assert result["source"] == "A"
+
+
+def test_matches_type_header():
+    result = match_columns({"A": "Transaction Type"})
+    assert result["type"] == "A"
+
+
+def test_handles_padded_whitespace_in_headers():
+    result = match_columns({"A": "  Date  ", "B": "Trans  Date"})
+    assert result["date"] == "A"
