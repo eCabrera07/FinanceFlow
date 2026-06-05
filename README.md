@@ -17,18 +17,36 @@ The column mapping is saved locally in `backend/data/mapping.json` so you only d
 
 ---
 
-## Prerequisites
+## Running locally
 
-- **Python 3.8+** with `pip`
-- **Node.js 18+** with `npm`
+### Option A — Docker (recommended, one command)
+
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+```bash
+docker-compose up
+```
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8000`
+
+Both servers support hot reload — edits to source files are reflected immediately without restarting containers.
+
+To stop:
+
+```bash
+docker-compose down
+```
 
 ---
 
-## Running locally
+### Option B — Without Docker
 
-You need two terminals — one for the backend, one for the frontend.
+**Prerequisites:** Python 3.8+ and Node.js 18+
 
-### 1. Backend
+You need two terminals.
+
+**Terminal 1 — Backend:**
 
 ```bash
 cd backend
@@ -36,9 +54,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-The API will be available at `http://localhost:8000`.
-
-### 2. Frontend
+**Terminal 2 — Frontend:**
 
 ```bash
 cd frontend
