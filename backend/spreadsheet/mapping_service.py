@@ -13,10 +13,11 @@ def save_mapping(mapping: Dict[str, Any]) -> None:
 
 
 def load_mapping() -> Optional[Dict[str, Any]]:
-    if not os.path.exists(MAPPING_FILE):
+    try:
+        with open(MAPPING_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
         return None
-    with open(MAPPING_FILE, encoding="utf-8") as f:
-        return json.load(f)
 
 
 def reset_mapping() -> None:

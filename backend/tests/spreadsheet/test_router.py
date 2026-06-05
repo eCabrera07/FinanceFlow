@@ -1,8 +1,15 @@
 import pytest
 from fastapi.testclient import TestClient
 from main import app
+from spreadsheet import mapping_service
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def isolated_mapping(tmp_path, monkeypatch):
+    monkeypatch.setattr(mapping_service, "DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(mapping_service, "MAPPING_FILE", str(tmp_path / "mapping.json"))
 
 
 def test_download_template_returns_xlsx():
