@@ -24,32 +24,37 @@ def write_transactions(
     If mapping is provided, targets the mapped sheet and columns.
     """
     wb = openpyxl.load_workbook(file_path)
+    try:
+        target_sheet = mapping["sheet_name"] if mapping else sheet_name
+        if target_sheet not in wb.sheetnames:
+            if "_template" in wb.sheetnames:
+                # Copy the hidden template tab so the new month gets headers + formulas.
+                new_ws = wb.copy_worksheet(wb["_template"])
+                new_ws.title = target_sheet
+            else:
+                wb.create_sheet(target_sheet)  # fallback when no template tab exists
+        ws = wb[target_sheet]
 
-    target_sheet = mapping["sheet_name"] if mapping else sheet_name
-    if target_sheet not in wb.sheetnames:
-        if "_template" in wb.sheetnames:
-            # Copy the hidden template tab so the new month gets headers + formulas.
-            new_ws = wb.copy_worksheet(wb["_template"])
-            new_ws.title = target_sheet
+        col_map = mapping["columns"] if mapping else _DEFAULT_COLUMNS
+
+        if mapping and str(mapping.get("start_row", "auto")) != "auto":
+            start_row = int(mapping["start_row"])
         else:
-            wb.create_sheet(target_sheet)  # fallback when no template tab exists
-    ws = wb[target_sheet]
+            start_row = _first_empty_row_in_col_a(ws)
 
-    col_map = mapping["columns"] if mapping else _DEFAULT_COLUMNS
+        if start_row < 1:
+            raise ValueError(f"start_row must be >= 1, got {start_row}")
 
-    if mapping and str(mapping.get("start_row", "auto")) != "auto":
-        start_row = int(mapping["start_row"])
-    else:
-        start_row = _first_empty_row_in_col_a(ws)
+        for offset, tx in enumerate(transactions):
+            row = start_row + offset
+            for field, col_letter in col_map.items():
+                if col_letter is None:
+                    continue
+                ws.cell(row=row, column=column_index_from_string(col_letter), value=tx.get(field))
 
-    for offset, tx in enumerate(transactions):
-        row = start_row + offset
-        for field, col_letter in col_map.items():
-            if col_letter is None:
-                continue
-            ws.cell(row=row, column=column_index_from_string(col_letter), value=tx.get(field))
-
-    wb.save(file_path)
+        wb.save(file_path)
+    finally:
+        wb.close()
 
 
 def _first_empty_row_in_col_a(ws) -> int:
