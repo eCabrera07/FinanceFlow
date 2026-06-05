@@ -30,7 +30,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-16">
+    <main className={`mx-auto px-4 py-16 ${statementState === "reviewing" ? "max-w-5xl" : "max-w-2xl"}`}>
       <h1 className="mb-2 text-3xl font-bold text-gray-900">FinanceFlow</h1>
       <p className="mb-10 text-gray-500">
         Import bank statements, categorize transactions, track your spending.
