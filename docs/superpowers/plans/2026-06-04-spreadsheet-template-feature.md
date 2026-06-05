@@ -294,7 +294,15 @@ def main():
 
     build_budgets_tab(wb)
     build_dashboard_tab(wb)
-    build_monthly_tab(wb, "Jan 2026")  # placeholder to show the structure
+
+    # Hidden _template tab — writer copies this every time a new month tab is needed.
+    # This ensures every month gets the same header row + H:I formulas automatically.
+    build_monthly_tab(wb, "_template")
+    wb["_template"].sheet_state = "hidden"
+
+    # Starter visible month tab — created by copying _template so it's identical.
+    jan = wb.copy_worksheet(wb["_template"])
+    jan.title = "Jan 2026"
 
     out = os.path.join(os.path.dirname(__file__), "..", "assets", "default_template.xlsx")
     os.makedirs(os.path.dirname(out), exist_ok=True)
@@ -361,6 +369,22 @@ def test_template_has_required_sheets():
     wb = openpyxl.load_workbook(TEMPLATE_PATH)
     assert "📋 Budgets" in wb.sheetnames
     assert "📊 Dashboard" in wb.sheetnames
+    assert "_template" in wb.sheetnames
+    assert "Jan 2026" in wb.sheetnames
+    wb.close()
+
+
+def test_template_tab_is_hidden():
+    wb = openpyxl.load_workbook(TEMPLATE_PATH)
+    assert wb["_template"].sheet_state == "hidden"
+    wb.close()
+
+
+def test_template_tab_has_month_structure():
+    wb = openpyxl.load_workbook(TEMPLATE_PATH)
+    ws = wb["_template"]
+    assert ws["A1"].value == "Date"   # transaction header row
+    assert ws["H1"].value == "Summary"  # summary block header
     wb.close()
 
 
@@ -1072,6 +1096,28 @@ def test_creates_sheet_if_missing(tmp_path):
 
     wb2 = openpyxl.load_workbook(path)
     assert "Feb 2026" in wb2.sheetnames
+
+
+def test_new_month_tab_copied_from_template(tmp_path):
+    """When the xlsx has a _template tab, new month tabs should be copied from it
+    so they inherit the header row and H:I summary formulas."""
+    import shutil
+    from spreadsheet.template_service import TEMPLATE_PATH
+
+    dest = str(tmp_path / "finances.xlsx")
+    shutil.copy2(TEMPLATE_PATH, dest)
+
+    write_transactions(dest, "Feb 2026", [make_transaction()], mapping=None)
+
+    wb = openpyxl.load_workbook(dest)
+    assert "Feb 2026" in wb.sheetnames
+    ws = wb["Feb 2026"]
+    # Header row inherited from _template
+    assert ws["A1"].value == "Date"
+    assert ws["H1"].value == "Summary"
+    # Transaction written at row 2 (row 1 is the header)
+    assert ws["A2"].value == "2026-01-15"
+    assert ws["B2"].value == "Walmart"
 ```
 
 - [ ] **Step 2: Run tests — confirm they fail**
@@ -1114,7 +1160,12 @@ def write_transactions(
 
     target_sheet = mapping["sheet_name"] if mapping else sheet_name
     if target_sheet not in wb.sheetnames:
-        wb.create_sheet(target_sheet)
+        if "_template" in wb.sheetnames:
+            # Copy the hidden template tab so the new month gets headers + formulas.
+            new_ws = wb.copy_worksheet(wb["_template"])
+            new_ws.title = target_sheet
+        else:
+            wb.create_sheet(target_sheet)  # fallback when no template tab exists
     ws = wb[target_sheet]
 
     col_map = mapping["columns"] if mapping else _DEFAULT_COLUMNS
