@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="24.0.0">
+  <diagram id="financeflow" name="FinanceFlow Architecture">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- TITLE -->
+        <mxCell id="2" value="FinanceFlow — Architecture &amp; Project Flow" style="text;html=1;fontSize=22;fontStyle=1;align=center;fillColor=none;strokeColor=none;fontColor=#1e293b;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="1000" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ===== USER FLOW LABEL ===== -->
+        <mxCell id="3" value="User Flow" style="text;html=1;fontSize=12;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#64748b;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="200" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Step 1: Upload -->
+        <mxCell id="4" value="&lt;b&gt;1&lt;/b&gt; Upload&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#374151&quot;&gt;Drop PDF or CSV&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontSize=12;fontColor=#1e293b;" vertex="1" parent="1">
+          <mxGeometry x="80" y="105" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="5" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#3b82f6;" edge="1" source="4" target="6" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 2: Extract -->
+        <mxCell id="6" value="&lt;b&gt;2&lt;/b&gt; Extract&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#374151&quot;&gt;Parse transactions&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;fontSize=12;fontColor=#1e293b;" vertex="1" parent="1">
+          <mxGeometry x="270" y="105" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="7" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#f59e0b;" edge="1" source="6" target="8" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 3: Categorize -->
+        <mxCell id="8" value="&lt;b&gt;3&lt;/b&gt; Categorize&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#374151&quot;&gt;Rule-based matching&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;fontSize=12;fontColor=#1e293b;" vertex="1" parent="1">
+          <mxGeometry x="460" y="105" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="9" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#f59e0b;" edge="1" source="8" target="10" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 4: Review -->
+        <mxCell id="10" value="&lt;b&gt;4&lt;/b&gt; Review&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#374151&quot;&gt;Approve / edit / skip&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontSize=12;fontColor=#1e293b;" vertex="1" parent="1">
+          <mxGeometry x="650" y="105" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="11" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#22c55e;" edge="1" source="10" target="12" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 5: Save -->
+        <mxCell id="12" value="&lt;b&gt;5&lt;/b&gt; Save&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#374151&quot;&gt;Write to spreadsheet&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#22c55e;fontSize=12;fontColor=#1e293b;" vertex="1" parent="1">
+          <mxGeometry x="840" y="105" width="140" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ===== FRONTEND LAYER ===== -->
+        <mxCell id="13" value="&#x1F310;  Frontend — Next.js (React)  |  Runs in your browser" style="swimlane;startSize=32;fillColor=#dbeafe;strokeColor=#3b82f6;fontSize=13;fontStyle=1;fontColor=#1e3a8a;swimlaneLine=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="230" width="1040" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="14" value="&#x1F4E4; Upload Screen&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#6b7280&quot;&gt;Drag &amp; drop PDF / CSV&lt;br/&gt;Import history&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3b82f6;fontSize=11;fontColor=#1e293b;" vertex="1" parent="13">
+          <mxGeometry x="60" y="44" width="180" height="62" as="geometry" />
+        </mxCell>
+
+        <mxCell id="15" value="&#x2705; Review Screen&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#6b7280&quot;&gt;Per-transaction approval&lt;br/&gt;Category editing&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3b82f6;fontSize=11;fontColor=#1e293b;" vertex="1" parent="13">
+          <mxGeometry x="430" y="44" width="180" height="62" as="geometry" />
+        </mxCell>
+
+        <mxCell id="16" value="&#x1F4CA; Spreadsheet View&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#6b7280&quot;&gt;Monthly tab nav&lt;br/&gt;Category summary banner&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3b82f6;fontSize=11;fontColor=#1e293b;" vertex="1" parent="13">
+          <mxGeometry x="800" y="44" width="180" height="62" as="geometry" />
+        </mxCell>
+
+        <!-- Frontend → Backend Arrow -->
+        <mxCell id="17" value="HTTP REST API" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;fontColor=#64748b;strokeColor=#94a3b8;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="13" target="18" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ===== BACKEND LAYER ===== -->
+        <mxCell id="18" value="&#x2699;&#xFE0F;  Backend — Python (FastAPI)  |  Runs locally on your computer" style="swimlane;startSize=32;fillColor=#ffedd5;strokeColor=#f97316;fontSize=13;fontStyle=1;fontColor=#7c2d12;swimlaneLine=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="420" width="1040" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="19" value="&#x1F4C4; PDF Reader&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#6b7280&quot;&gt;pdfplumber&lt;br/&gt;Text extraction&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f97316;fontSize=11;fontColor=#1e293b;" vertex="1" parent="18">
+          <mxGeometry x="30" y="50" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="20" value="&#x1F4CB; CSV Reader&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#6b7280&quot;&gt;pandas&lt;br/&gt;Chase · BofA · Citi · more&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f97316;fontSize=11;fontColor=#1e293b;" vertex="1" parent="18">
+          <mxGeometry x="230" y="50" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="21" value="&#x1F916; Categorizer&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#6b7280&quot;&gt;Phase 1: rule-based&lt;br/&gt;Phase 2: Claude AI plug-in&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f97316;fontSize=11;fontColor=#1e293b;" vertex="1" parent="18">
+          <mxGeometry x="440" y="50" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="22" value="&#x1F4BE; Spreadsheet Writer&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#6b7280&quot;&gt;openpyxl (.xlsx)&lt;br/&gt;Google Sheets API&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f97316;fontSize=11;fontColor=#1e293b;" vertex="1" parent="18">
+          <mxGeometry x="650" y="50" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="23" value="&#x1F4F8; OCR Reader&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#9ca3af&quot;&gt;Phase 2 only&lt;br/&gt;pytesseract&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fafb;strokeColor=#d1d5db;fontSize=11;fontColor=#9ca3af;" vertex="1" parent="18">
+          <mxGeometry x="860" y="50" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Backend → Storage Arrow -->
+        <mxCell id="24" value="Read / Write" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;fontColor=#64748b;strokeColor=#94a3b8;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="18" target="25" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ===== STORAGE LAYER ===== -->
+        <mxCell id="25" value="&#x1F4C2;  Data Storage  |  No database — data lives in the spreadsheet" style="swimlane;startSize=32;fillColor=#dcfce7;strokeColor=#22c55e;fontSize=13;fontStyle=1;fontColor=#14532d;swimlaneLine=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="630" width="1040" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="26" value="&#x1F7E9; finance_2026.xlsx&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#6b7280&quot;&gt;Saved on your computer&lt;br/&gt;Jan 2026 | Feb 2026 | Mar 2026 …&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#22c55e;fontSize=11;fontColor=#1e293b;" vertex="1" parent="25">
+          <mxGeometry x="200" y="38" width="260" height="56" as="geometry" />
+        </mxCell>
+
+        <mxCell id="27" value="&#x1F4CA; Google Sheets (optional)&lt;br/&gt;&lt;font style=&quot;font-size:10px&quot; color=&quot;#6b7280&quot;&gt;Synced to your Google Drive&lt;br/&gt;Access from any device&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#22c55e;fontSize=11;fontColor=#1e293b;" vertex="1" parent="25">
+          <mxGeometry x="580" y="38" width="260" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- ===== PHASE 2 NOTE ===== -->
+        <mxCell id="28" value="&#x23F3;  Phase 2 (future): Screenshot OCR  +  Claude AI categorization  —  both designed as drop-in swaps, no refactor needed" style="text;html=1;fontSize=11;fontStyle=2;align=center;fillColor=#f1f5f9;strokeColor=#cbd5e1;fontColor=#94a3b8;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="768" width="880" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
