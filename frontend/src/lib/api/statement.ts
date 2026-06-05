@@ -28,7 +28,12 @@ export async function confirmTransactions(
   const res = await fetch(`${BASE}/statement/confirm`, { method: "POST", body: form });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(text || `HTTP ${res.status}`);
+    try {
+      const json = JSON.parse(text);
+      throw new Error(json.detail || text || `HTTP ${res.status}`);
+    } catch {
+      throw new Error(text || `HTTP ${res.status}`);
+    }
   }
   return res.blob();
 }
