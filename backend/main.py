@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from spreadsheet.router import router as spreadsheet_router
+from statement.router import router as statement_router
 
 app = FastAPI(title="FinanceFlow API")
 
@@ -12,3 +13,4 @@ app.add_middleware(
 )
 
 app.include_router(spreadsheet_router)
+app.include_router(statement_router)
