@@ -10,9 +10,10 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function uploadStatement(file: File): Promise<UploadResponse> {
+export async function uploadStatement(file: File, creditCard: boolean = false): Promise<UploadResponse> {
   const form = new FormData();
   form.append("file", file);
+  form.append("credit_card", String(creditCard));
   const res = await fetch(`${BASE}/statement/upload`, { method: "POST", body: form });
   return handleResponse<UploadResponse>(res);
 }

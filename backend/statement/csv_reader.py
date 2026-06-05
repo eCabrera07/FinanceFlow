@@ -13,19 +13,23 @@ def _parse_amount(value: str) -> float:
     return float(v) if v else 0.0
 
 
-def _make_transaction(date: str, description: str, amount: float, source: str) -> Transaction:
+def _make_transaction(date: str, description: str, amount: float, source: str, credit_card: bool = False) -> Transaction:
     cat = categorize(description)
+    if credit_card:
+        tx_type = "Expense" if amount >= 0 else "Income"
+    else:
+        tx_type = "Income" if amount >= 0 else "Expense"
     return Transaction(
         date=date.strip(),
         description=description.strip(),
         amount=amount,
         category=cat if cat is not None else "Uncategorized",
         source=source,
-        type="Income" if amount >= 0 else "Expense",
+        type=tx_type,
     )
 
 
-def parse_csv(file: IO[str], source: str = "unknown") -> list[Transaction]:
+def parse_csv(file: IO[str], source: str = "unknown", credit_card: bool = False) -> list[Transaction]:
     """Parse a bank CSV export into Transactions.
 
     Auto-detects the bank from column headers. Falls back to generic
@@ -60,7 +64,7 @@ def parse_csv(file: IO[str], source: str = "unknown") -> list[Transaction]:
                         credit = _parse_amount(credit_raw)
                         if credit != 0:
                             amount = credit
-                transactions.append(_make_transaction(date, description, amount, source))
+                transactions.append(_make_transaction(date, description, amount, source, credit_card))
             except (ValueError, KeyError):
                 continue
     else:
@@ -89,7 +93,7 @@ def parse_csv(file: IO[str], source: str = "unknown") -> list[Transaction]:
                     credit = _parse_amount(row[credit_col])
                     if credit != 0:
                         amount = credit
-                transactions.append(_make_transaction(date, description, amount, source))
+                transactions.append(_make_transaction(date, description, amount, source, credit_card))
             except (ValueError, KeyError):
                 continue
 

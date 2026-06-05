@@ -9,6 +9,7 @@ interface Props {
 
 export default function UploadArea({ onUploaded }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const [creditCard, setCreditCard] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
@@ -17,7 +18,7 @@ export default function UploadArea({ onUploaded }: Props) {
     setLoading(true);
     setError("");
     try {
-      const result = await uploadStatement(file);
+      const result = await uploadStatement(file, creditCard);
       if (result.transactions.length === 0) {
         setError("No transactions found. Make sure it's a bank statement PDF or CSV.");
         return;
@@ -44,6 +45,30 @@ export default function UploadArea({ onUploaded }: Props) {
 
   return (
     <div>
+      {/* Statement type selector */}
+      <div className="mb-4 flex gap-4">
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+          <input
+            type="radio"
+            name="statementType"
+            checked={!creditCard}
+            onChange={() => setCreditCard(false)}
+            className="accent-emerald-600"
+          />
+          Bank account statement
+        </label>
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+          <input
+            type="radio"
+            name="statementType"
+            checked={creditCard}
+            onChange={() => setCreditCard(true)}
+            className="accent-emerald-600"
+          />
+          Credit card statement
+        </label>
+      </div>
+
       <input
         ref={fileRef}
         type="file"

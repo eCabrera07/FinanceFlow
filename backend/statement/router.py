@@ -17,7 +17,10 @@ MAX_BYTES = 20 * 1024 * 1024  # 20 MB
 
 
 @router.post("/upload")
-async def upload_statement(file: UploadFile = File(...)):
+async def upload_statement(
+    file: UploadFile = File(...),
+    credit_card: bool = Form(False),
+):
     """Upload a bank statement PDF or CSV. Returns extracted and categorized transactions."""
     filename = file.filename or ""
     ext = os.path.splitext(filename)[1].lower()
@@ -33,14 +36,17 @@ async def upload_statement(file: UploadFile = File(...)):
 
     try:
         if ext == ".csv":
-            transactions = parse_csv(io.StringIO(content.decode("utf-8", errors="replace")),
-                                     source=source)
+            transactions = parse_csv(
+                io.StringIO(content.decode("utf-8", errors="replace")),
+                source=source,
+                credit_card=credit_card,
+            )
         else:
             with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
                 tmp.write(content)
                 tmp_path = tmp.name
             try:
-                transactions = parse_pdf(tmp_path, source=source)
+                transactions = parse_pdf(tmp_path, source=source, credit_card=credit_card)
             finally:
                 os.unlink(tmp_path)
     except Exception as e:

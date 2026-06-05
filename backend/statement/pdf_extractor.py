@@ -21,7 +21,7 @@ def _parse_amount(raw: str) -> float:
     return float(cleaned)
 
 
-def parse_pdf(file_path: str, source: str = "unknown") -> list[Transaction]:
+def parse_pdf(file_path: str, source: str = "unknown", credit_card: bool = False) -> list[Transaction]:
     """Extract transactions from a bank statement PDF using regex line matching.
 
     Args:
@@ -49,6 +49,6 @@ def parse_pdf(file_path: str, source: str = "unknown") -> list[Transaction]:
                     amount=amount,
                     category=cat if cat is not None else "Uncategorized",
                     source=source,
-                    type="Income" if amount >= 0 else "Expense",
+                    type=("Expense" if amount >= 0 else "Income") if credit_card else ("Income" if amount >= 0 else "Expense"),
                 ))
     return transactions
