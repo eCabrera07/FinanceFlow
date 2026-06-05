@@ -221,7 +221,16 @@ export default function ImportWizard({ onClose, onComplete }: Props) {
               <button type="button" onClick={() => setStep(2)} className="text-xs text-gray-400 hover:text-gray-600">← Back</button>
               <button
                 type="button"
-                onClick={() => setStep(4)}
+                onClick={() => {
+                  const assigned = Object.values(columns).filter(Boolean);
+                  const unique = new Set(assigned);
+                  if (assigned.length !== unique.size) {
+                    setError("Two fields cannot map to the same column. Please adjust the mapping.");
+                    return;
+                  }
+                  setError("");
+                  setStep(4);
+                }}
                 className="rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700"
               >
                 Next →
