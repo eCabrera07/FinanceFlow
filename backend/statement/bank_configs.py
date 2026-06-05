@@ -51,7 +51,12 @@ BANK_CONFIGS: dict[str, dict] = {
 
 
 def detect_bank(headers: list[str]) -> str:
-    """Guess the bank from CSV column headers. Returns a key from BANK_CONFIGS or 'generic'."""
+    """Guess the bank from CSV column headers. Returns a key from BANK_CONFIGS or 'generic'.
+
+    Wells Fargo and Amex use standard column names (Date, Description, Amount)
+    that are indistinguishable from each other and many other banks — they are
+    handled correctly by the generic fallback path.
+    """
     lower = {h.lower().strip() for h in headers}
     if "transaction date" in lower and "post date" in lower:
         return "chase"
@@ -61,4 +66,6 @@ def detect_bank(headers: list[str]) -> str:
         return "capital_one"
     if "payee" in lower and "running bal." in lower:
         return "bofa"
+    if "debit" in lower and "credit" in lower and "date" in lower and "description" in lower:
+        return "citi"
     return "generic"
