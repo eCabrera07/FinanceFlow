@@ -59,9 +59,11 @@ export default function ImportWizard({ onClose, onComplete }: Props) {
 
   // ── Step 2: sheet select ────────────────────────────────────────────────────
   function handleSheetSelect(sheet: string) {
-    setSelectedSheet(sheet);
-    if (importData?.[sheet]) {
-      setColumns(importData[sheet].suggested_mapping);
+    if (sheet !== selectedSheet) {
+      setSelectedSheet(sheet);
+      if (importData?.[sheet]) {
+        setColumns(importData[sheet].suggested_mapping);
+      }
     }
     setStep(3);
   }
@@ -107,7 +109,7 @@ export default function ImportWizard({ onClose, onComplete }: Props) {
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Use My Own Spreadsheet</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
+          <button type="button" onClick={onClose} aria-label="Close" className="text-gray-400 hover:text-gray-600">✕</button>
         </div>
 
         {/* Step indicator */}
@@ -148,6 +150,7 @@ export default function ImportWizard({ onClose, onComplete }: Props) {
               onChange={handleFileChange}
             />
             <button
+              type="button"
               onClick={() => fileRef.current?.click()}
               disabled={loading}
               className="w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-8 text-sm text-gray-500 hover:border-emerald-400 hover:text-emerald-600 disabled:opacity-50"
@@ -178,7 +181,7 @@ export default function ImportWizard({ onClose, onComplete }: Props) {
                 </li>
               ))}
             </ul>
-            <button onClick={() => setStep(1)} className="mt-4 text-xs text-gray-400 hover:text-gray-600">← Back</button>
+            <button type="button" onClick={() => setStep(1)} className="mt-4 text-xs text-gray-400 hover:text-gray-600">← Back</button>
           </div>
         )}
 
@@ -195,7 +198,7 @@ export default function ImportWizard({ onClose, onComplete }: Props) {
                   <th className="pb-2">Your column</th>
                 </tr>
               </thead>
-              <tbody className="space-y-1">
+              <tbody>
                 {ALL_FIELDS.map(field => (
                   <tr key={field}>
                     <td className="py-1 pr-4 font-medium text-gray-700">{FIELD_LABELS[field]}</td>
@@ -215,8 +218,9 @@ export default function ImportWizard({ onClose, onComplete }: Props) {
               </tbody>
             </table>
             <div className="mt-4 flex justify-between">
-              <button onClick={() => setStep(2)} className="text-xs text-gray-400 hover:text-gray-600">← Back</button>
+              <button type="button" onClick={() => setStep(2)} className="text-xs text-gray-400 hover:text-gray-600">← Back</button>
               <button
+                type="button"
                 onClick={() => setStep(4)}
                 className="rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700"
               >
@@ -243,8 +247,9 @@ export default function ImportWizard({ onClose, onComplete }: Props) {
             </div>
             <p className="mt-1 text-xs text-gray-400">Type "auto" to append, or a row number (e.g. "2").</p>
             <div className="mt-6 flex justify-between">
-              <button onClick={() => setStep(3)} className="text-xs text-gray-400 hover:text-gray-600">← Back</button>
+              <button type="button" onClick={() => setStep(3)} className="text-xs text-gray-400 hover:text-gray-600">← Back</button>
               <button
+                type="button"
                 onClick={handleFinish}
                 disabled={loading}
                 className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
