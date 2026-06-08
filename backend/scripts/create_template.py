@@ -44,17 +44,17 @@ def build_budgets_tab(wb):
 def build_monthly_tab(wb, month_name: str):
     ws = wb.create_sheet(month_name)
 
-    for col, label in enumerate(["Date", "Description", "Amount", "Category", "Source", "Type"], start=1):
+    for col, label in enumerate(["Date", "Description", "Amount", "Category", "Type"], start=1):
         cell = ws.cell(row=1, column=col)
         cell.value = label
         cell.font = HEADER_FONT
 
-    ws["H1"] = "Summary"
+    ws["H1"] = "📊 Monthly Summary"
     ws["H1"].font = HEADER_FONT
     ws["H2"] = "Total Income"
-    ws["I2"] = '=SUMIF(F:F,"Income",C:C)'
+    ws["I2"] = '=SUMIF(E:E,"Income",C:C)'
     ws["H3"] = "Total Expenses"
-    ws["I3"] = '=SUMIF(F:F,"Expense",C:C)'
+    ws["I3"] = '=SUMIF(E:E,"Expense",C:C)'
     ws["H4"] = "Net Balance"
     ws["I4"] = "=I2-I3"
     ws["H5"] = "Uncategorized"
@@ -68,7 +68,7 @@ def build_monthly_tab(wb, month_name: str):
         ws[f"H{i}"] = cat
         ws[f"I{i}"] = f'=SUMIF(D:D,"{cat}",C:C)'
 
-    _set_col_widths(ws, {"A": 12, "B": 32, "C": 12, "D": 20, "E": 20, "F": 10, "H": 20, "I": 14})
+    _set_col_widths(ws, {"A": 12, "B": 32, "C": 12, "D": 20, "E": 10, "H": 20, "I": 14})
     return ws
 
 

@@ -3,7 +3,6 @@ import json
 import os
 import shutil
 import tempfile
-from collections import Counter
 from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
@@ -22,8 +21,8 @@ MAX_BYTES = 20 * 1024 * 1024  # 20 MB
 
 
 def _sheet_name_from_transactions(txs: list[dict]) -> str:
-    """Return 'Mon YYYY' derived from the most common month in the transaction dates."""
-    counts: Counter = Counter()
+    """Return 'Mon YYYY' derived from the latest month in the transaction dates."""
+    months: set = set()
     current_year = datetime.now().year
     for tx in txs:
         parts = str(tx.get("date", "")).split("/")
@@ -35,11 +34,11 @@ def _sheet_name_from_transactions(txs: list[dict]) -> str:
             if len(str(year)) == 2:
                 year = 2000 + year
             if 1 <= month <= 12:
-                counts[(month, year)] += 1
+                months.add((year, month))
         except (ValueError, IndexError):
             continue
-    if counts:
-        (month, year), _ = counts.most_common(1)[0]
+    if months:
+        year, month = max(months)
         return datetime(year, month, 1).strftime("%b %Y")
     return datetime.now().strftime("%b %Y")
 

@@ -34,8 +34,7 @@ def test_writes_to_default_columns(tmp_path):
     assert ws["B1"].value == "Walmart"
     assert ws["C1"].value == 52.40
     assert ws["D1"].value == "Groceries"
-    assert ws["E1"].value == "Chase"
-    assert ws["F1"].value == "Expense"
+    assert ws["E1"].value == "Expense"
 
 
 def test_appends_below_existing_rows(tmp_path):

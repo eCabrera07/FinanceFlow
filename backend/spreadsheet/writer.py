@@ -7,8 +7,7 @@ _DEFAULT_COLUMNS = {
     "description": "B",
     "amount": "C",
     "category": "D",
-    "source": "E",
-    "type": "F",
+    "type": "E",
 }
 
 
