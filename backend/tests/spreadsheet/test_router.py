@@ -80,3 +80,22 @@ def test_delete_mapping_clears_it():
     client.delete("/spreadsheet/mapping")
     response = client.get("/spreadsheet/mapping")
     assert response.json()["mapping"] is None
+
+
+def test_status_returns_false_when_no_volume_file(tmp_path, monkeypatch):
+    import spreadsheet.router as spreadsheet_router
+    monkeypatch.setattr(spreadsheet_router, "VOLUME_XLSX_PATH", str(tmp_path / "FinanceFlow.xlsx"))
+    response = client.get("/spreadsheet/status")
+    assert response.status_code == 200
+    assert response.json() == {"has_volume_file": False}
+
+
+def test_status_returns_true_when_volume_file_exists(tmp_path, monkeypatch):
+    import spreadsheet.router as spreadsheet_router
+    volume_path = str(tmp_path / "FinanceFlow.xlsx")
+    monkeypatch.setattr(spreadsheet_router, "VOLUME_XLSX_PATH", volume_path)
+    # Create the file so the endpoint can find it
+    open(volume_path, "wb").close()
+    response = client.get("/spreadsheet/status")
+    assert response.status_code == 200
+    assert response.json() == {"has_volume_file": True}

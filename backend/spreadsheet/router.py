@@ -9,6 +9,7 @@ from .template_service import get_template_path
 from .import_service import read_spreadsheet_structure
 from .column_matcher import match_columns
 from .mapping_service import save_mapping, load_mapping, reset_mapping
+from config import VOLUME_XLSX_PATH
 
 router = APIRouter(prefix="/spreadsheet", tags=["spreadsheet"])
 
@@ -30,7 +31,7 @@ def download_template():
     return FileResponse(
         path,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        filename="FinanceFlow.xlsx",
+        filename="FinanceFlow Personal Finance.xlsx",
     )
 
 
@@ -88,3 +89,9 @@ def delete_column_mapping():
     """Clear the saved mapping — next import will re-run the wizard."""
     reset_mapping()
     return {"status": "reset"}
+
+
+@router.get("/status")
+def get_spreadsheet_status():
+    """Return whether a persistent volume-mounted xlsx exists."""
+    return {"has_volume_file": os.path.exists(VOLUME_XLSX_PATH)}
