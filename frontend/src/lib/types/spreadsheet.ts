@@ -21,3 +21,7 @@ export interface ColumnMapping {
   start_row: string;                          // "auto" or a number as string
   columns: Record<FieldName, string | null>;
 }
+
+export interface SpreadsheetStatus {
+  has_volume_file: boolean;
+}

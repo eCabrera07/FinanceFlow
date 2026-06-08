@@ -12,6 +12,7 @@ export const CATEGORIES = [
   "Travel",
   "Hobbies",
   "Other",
+  "Credit Card Payment",
   "Uncategorized",
 ] as const;
 
@@ -31,3 +32,7 @@ export interface UploadResponse {
   source: string;
   count: number;
 }
+
+export type ConfirmResult =
+  | { kind: "downloaded" }
+  | { kind: "written"; status: "written" | "created" };

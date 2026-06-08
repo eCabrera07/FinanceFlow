@@ -1,4 +1,4 @@
-import type { Transaction, UploadResponse } from "@/lib/types/statement";
+import type { Transaction, UploadResponse, ConfirmResult } from "@/lib/types/statement";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -20,11 +20,11 @@ export async function uploadStatement(file: File, creditCard: boolean = false): 
 
 export async function confirmTransactions(
   transactions: Transaction[],
-  spreadsheet: File,
-): Promise<Blob> {
+  spreadsheet: File | null,
+): Promise<ConfirmResult> {
   const form = new FormData();
   form.append("transactions", JSON.stringify(transactions));
-  form.append("spreadsheet", spreadsheet);
+  if (spreadsheet) form.append("spreadsheet", spreadsheet);
   const res = await fetch(`${BASE}/statement/confirm`, { method: "POST", body: form });
   if (!res.ok) {
     const text = await res.text();
@@ -35,7 +35,14 @@ export async function confirmTransactions(
       throw new Error(text || `HTTP ${res.status}`);
     }
   }
-  return res.blob();
+  const contentType = res.headers.get("content-type") ?? "";
+  if (contentType.includes("spreadsheetml")) {
+    const blob = await res.blob();
+    downloadBlob(blob, "FinanceFlow_updated.xlsx");
+    return { kind: "downloaded" };
+  }
+  const json = await res.json();
+  return { kind: "written", status: json.status };
 }
 
 export function downloadBlob(blob: Blob, filename: string): void {

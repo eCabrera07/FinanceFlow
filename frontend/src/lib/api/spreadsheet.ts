@@ -1,4 +1,4 @@
-import type { ColumnMapping, ImportResponse } from "@/lib/types/spreadsheet";
+import type { ColumnMapping, ImportResponse, SpreadsheetStatus } from "@/lib/types/spreadsheet";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -43,4 +43,9 @@ export async function saveMapping(mapping: ColumnMapping): Promise<void> {
 export async function resetMapping(): Promise<void> {
   const res = await fetch(`${BASE}/spreadsheet/mapping`, { method: "DELETE" });
   await handleResponse<unknown>(res);
+}
+
+export async function getSpreadsheetStatus(): Promise<SpreadsheetStatus> {
+  const res = await fetch(`${BASE}/spreadsheet/status`);
+  return handleResponse<SpreadsheetStatus>(res);
 }
