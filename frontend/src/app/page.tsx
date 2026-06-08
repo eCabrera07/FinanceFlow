@@ -1,7 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import CreateSpreadsheetButton from "@/components/spreadsheet/CreateSpreadsheetButton";
-import ImportWizard from "@/components/spreadsheet/ImportWizard";
 import UploadArea from "@/components/statement/UploadArea";
 import ReviewTable from "@/components/statement/ReviewTable";
 import { getSpreadsheetStatus } from "@/lib/api/spreadsheet";
@@ -10,8 +8,6 @@ import type { Transaction, UploadResponse } from "@/lib/types/statement";
 type StatementState = "idle" | "reviewing";
 
 export default function HomePage() {
-  const [showWizard, setShowWizard] = useState(false);
-  const [mappingSet, setMappingSet] = useState(false);
   const [statementState, setStatementState] = useState<StatementState>("idle");
   const [accumulatedTransactions, setAccumulatedTransactions] = useState<Transaction[]>([]);
   const [hasVolumeFile, setHasVolumeFile] = useState(false);
@@ -26,11 +22,6 @@ export default function HomePage() {
     getSpreadsheetStatus()
       .then((s) => setHasVolumeFile(s.has_volume_file))
       .catch(() => {});
-  }
-
-  function handleWizardComplete() {
-    setMappingSet(true);
-    setShowWizard(false);
   }
 
   function handleUploaded(result: UploadResponse) {
@@ -51,32 +42,8 @@ export default function HomePage() {
         Import bank statements, categorize transactions, track your spending.
       </p>
 
-      {/* Spreadsheet setup */}
-      <section className="rounded-xl border border-gray-200 p-6">
-        <h2 className="mb-1 text-base font-semibold text-gray-800">Set up your spreadsheet</h2>
-        <p className="mb-5 text-sm text-gray-500">
-          Start with the FinanceFlow template (includes charts + dashboard), or connect your own.
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <CreateSpreadsheetButton />
-          <span className="text-xs text-gray-400">or</span>
-          <button
-            type="button"
-            onClick={() => setShowWizard(true)}
-            className="text-sm font-medium text-emerald-700 underline-offset-2 hover:underline"
-          >
-            Use my own spreadsheet →
-          </button>
-        </div>
-        {mappingSet && (
-          <p className="mt-4 rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
-            ✓ Spreadsheet mapping saved. Future imports will write to your file automatically.
-          </p>
-        )}
-      </section>
-
       {/* Statement import */}
-      <section className="mt-6 rounded-xl border border-gray-200 p-6">
+      <section className="rounded-xl border border-gray-200 p-6">
         <h2 className="mb-1 text-base font-semibold text-gray-800">Import a statement</h2>
         <p className="mb-5 text-sm text-gray-500">
           Upload a bank statement PDF or CSV. Review and edit categories before writing to your spreadsheet.
@@ -96,9 +63,6 @@ export default function HomePage() {
         )}
       </section>
 
-      {showWizard && (
-        <ImportWizard onClose={() => setShowWizard(false)} onComplete={handleWizardComplete} />
-      )}
     </main>
   );
 }
