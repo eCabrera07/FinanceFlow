@@ -5,7 +5,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - backend_data:/app/data
+      - ./data:/app/data
     environment:
       - PYTHONUNBUFFERED=1
 
@@ -21,6 +21,3 @@ services:
       - WATCHPACK_POLLING=true
     depends_on:
       - backend
-
-volumes:
-  backend_data:
