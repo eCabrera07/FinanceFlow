@@ -70,7 +70,7 @@ def test_upload_unsupported_format_returns_400():
     assert res.status_code == 400
 
 
-def test_confirm_without_mapping_uses_default_template():
+def test_confirm_without_mapping_with_uploaded_file():
     txs = [{"date": "01/15/2026", "description": "Netflix", "amount": -15.99,
              "category": "Subscriptions", "source": "Chase", "type": "Expense"}]
     wb = openpyxl.Workbook()
