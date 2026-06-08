@@ -10,7 +10,6 @@ CATEGORIES = [
     "Healthcare",
     "Utilities",
     "Travel",
-    "Hobbies",
     "Other",
     "Credit Card Payment",
 ]

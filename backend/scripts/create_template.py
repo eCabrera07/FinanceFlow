@@ -11,7 +11,7 @@ from openpyxl.chart import BarChart, DoughnutChart, Reference
 CATEGORIES = [
     "Food & Dining", "Gas & Fuel", "Groceries", "Shopping",
     "Subscriptions", "Entertainment", "Healthcare", "Utilities",
-    "Travel", "Hobbies", "Other",
+    "Travel", "Other",
 ]
 
 MONTHS = [
