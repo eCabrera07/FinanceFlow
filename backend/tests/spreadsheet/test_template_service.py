@@ -27,7 +27,7 @@ def test_template_tab_has_month_structure():
     wb = openpyxl.load_workbook(TEMPLATE_PATH)
     ws = wb["_template"]
     assert ws["A1"].value == "Date"
-    assert ws["H1"].value == "Summary"
+    assert ws["H1"].value == "📊 Monthly Summary"
     wb.close()
 
 

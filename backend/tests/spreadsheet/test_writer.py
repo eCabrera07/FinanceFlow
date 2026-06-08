@@ -32,7 +32,7 @@ def test_writes_to_default_columns(tmp_path):
     ws = wb["Jan 2026"]
     assert ws["A1"].value == "2026-01-15"
     assert ws["B1"].value == "Walmart"
-    assert ws["C1"].value == -52.40
+    assert ws["C1"].value == 52.40
     assert ws["D1"].value == "Groceries"
     assert ws["E1"].value == "Chase"
     assert ws["F1"].value == "Expense"
@@ -75,7 +75,7 @@ def test_writes_to_mapped_columns(tmp_path):
     ws2 = wb2["MySheet"]
     assert ws2["C3"].value == "2026-01-15"
     assert ws2["D3"].value == "Walmart"
-    assert ws2["E3"].value == -52.40
+    assert ws2["E3"].value == 52.40
     assert ws2["C1"].value == "Date Header"  # existing data untouched
 
 
@@ -91,7 +91,7 @@ def test_skips_none_columns_in_mapping(tmp_path):
     wb = openpyxl.load_workbook(path)
     ws = wb["Data"]
     assert ws["A1"].value == "2026-01-15"
-    assert ws["B1"].value == -52.40
+    assert ws["B1"].value == 52.40
     assert ws["C1"].value is None  # no column C written
 
 
@@ -122,7 +122,7 @@ def test_new_month_tab_copied_from_template(tmp_path):
     ws = wb["Feb 2026"]
     # Header row inherited from _template
     assert ws["A1"].value == "Date"
-    assert ws["H1"].value == "Summary"
+    assert ws["H1"].value == "📊 Monthly Summary"
     # Transaction written at row 2 (row 1 is the header)
     assert ws["A2"].value == "2026-01-15"
     assert ws["B2"].value == "Walmart"

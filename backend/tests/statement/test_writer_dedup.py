@@ -46,5 +46,5 @@ def test_same_desc_different_amount_both_written(tmp_path):
 
     wb = openpyxl.load_workbook(path)
     ws = wb["Jan 2026"]
-    assert ws["C1"].value == -15.99
-    assert ws["C2"].value == -16.99
+    assert ws["C1"].value == 15.99
+    assert ws["C2"].value == 16.99

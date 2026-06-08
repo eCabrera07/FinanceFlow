@@ -51,7 +51,10 @@ def write_transactions(
         for field, col_letter in col_map.items():
             if col_letter is None:
                 continue
-            ws.cell(row=write_row, column=column_index_from_string(col_letter), value=tx.get(field))
+            value = tx.get(field)
+            if field == "amount" and isinstance(value, (int, float)):
+                value = abs(value)
+            ws.cell(row=write_row, column=column_index_from_string(col_letter), value=value)
         existing.add(key)
         write_row += 1
 
@@ -59,7 +62,7 @@ def write_transactions(
 
 
 def _key(tx: Dict[str, Any]) -> tuple:
-    return (str(tx.get("date", "")), str(tx.get("description", "")), float(tx.get("amount", 0)))
+    return (str(tx.get("date", "")), str(tx.get("description", "")), abs(float(tx.get("amount", 0))))
 
 
 def _existing_keys(ws, col_map: Dict[str, Any]) -> set:

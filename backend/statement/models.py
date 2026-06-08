@@ -12,6 +12,7 @@ CATEGORIES = [
     "Travel",
     "Hobbies",
     "Other",
+    "Credit Card Payment",
 ]
 
 

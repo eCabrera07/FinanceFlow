@@ -2,9 +2,9 @@ from typing import Optional
 
 _RULES: list[tuple[str, str]] = [
     # Credit card payments — must be first so they don't match gas/utility keywords
-    ("payment thank you", "Other"),
-    ("autopay", "Other"),
-    ("online payment", "Other"),
+    ("payment thank you", "Credit Card Payment"),
+    ("autopay", "Credit Card Payment"),
+    ("online payment", "Credit Card Payment"),
     ("netflix", "Subscriptions"),
     ("spotify", "Subscriptions"),
     ("hulu", "Subscriptions"),

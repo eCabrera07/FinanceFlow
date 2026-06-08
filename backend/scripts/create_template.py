@@ -11,7 +11,7 @@ from openpyxl.chart import BarChart, DoughnutChart, Reference
 CATEGORIES = [
     "Food & Dining", "Gas & Fuel", "Groceries", "Shopping",
     "Subscriptions", "Entertainment", "Healthcare", "Utilities",
-    "Travel", "Other",
+    "Travel", "Hobbies", "Other",
 ]
 
 MONTHS = [
@@ -56,7 +56,7 @@ def build_monthly_tab(wb, month_name: str):
     ws["H3"] = "Total Expenses"
     ws["I3"] = '=SUMIF(F:F,"Expense",C:C)'
     ws["H4"] = "Net Balance"
-    ws["I4"] = "=I2+I3"
+    ws["I4"] = "=I2-I3"
     ws["H5"] = "Uncategorized"
     ws["I5"] = '=COUNTIF(D:D,"Uncategorized")'
     ws.conditional_formatting.add("I5", CellIsRule(operator="greaterThan", formula=["0"], fill=YELLOW))
@@ -86,7 +86,7 @@ def build_dashboard_tab(wb):
         ws[f"A{i}"] = month
         ws[f"B{i}"] = f'=IFERROR(INDIRECT("\'"&A{i}&"\'!I3"),0)'
         ws[f"C{i}"] = f'=IFERROR(INDIRECT("\'"&A{i}&"\'!I2"),0)'
-        ws[f"D{i}"] = f"=C{i}+B{i}"
+        ws[f"D{i}"] = f"=C{i}-B{i}"
 
     ws["F1"] = "Budget Progress"
     ws["F1"].font = Font(bold=True, size=13)
