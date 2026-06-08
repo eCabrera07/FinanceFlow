@@ -118,6 +118,8 @@ async def confirm_transactions(
                 mapping=mapping,
             )
         except Exception as e:
+            if os.path.exists(VOLUME_XLSX_PATH):
+                os.unlink(VOLUME_XLSX_PATH)
             raise HTTPException(status_code=500, detail=f"Failed to write transactions: {e}")
         return {"status": "written"}
 
