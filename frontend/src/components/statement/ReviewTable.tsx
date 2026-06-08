@@ -139,7 +139,12 @@ export default function ReviewTable({ transactions, hasVolumeFile, onAddMore, on
     <div>
       {/* Add another statement */}
       <div className="mb-4 rounded-lg border border-dashed border-gray-300 p-3">
-        <p className="mb-2 text-xs font-medium text-gray-600">Add another statement</p>
+        <div className="mb-2 flex flex-wrap items-center gap-1.5">
+          <p className="text-xs font-medium text-gray-600">Add another statement</p>
+          {Array.from(new Set(transactions.map((tx) => tx.source))).map((src) => (
+            <span key={src} className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-500">{src}</span>
+          ))}
+        </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex gap-3">
             <label className="flex cursor-pointer items-center gap-1.5 text-xs text-gray-600">
