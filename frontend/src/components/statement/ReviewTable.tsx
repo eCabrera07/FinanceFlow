@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
-import { confirmTransactions, downloadBlob } from "@/lib/api/statement";
+import { useEffect, useRef, useState } from "react";
+import { confirmTransactions, uploadStatement } from "@/lib/api/statement";
 import { CATEGORIES } from "@/lib/types/statement";
-import type { Transaction } from "@/lib/types/statement";
+import type { ConfirmResult, Transaction, UploadResponse } from "@/lib/types/statement";
 
 interface Row {
   tx: Transaction;
@@ -11,16 +11,35 @@ interface Row {
 
 interface Props {
   transactions: Transaction[];
+  hasVolumeFile: boolean;
+  onAddMore: (result: UploadResponse) => void;
   onDone: () => void;
 }
 
-export default function ReviewTable({ transactions, onDone }: Props) {
+export default function ReviewTable({ transactions, hasVolumeFile, onAddMore, onDone }: Props) {
   const [rows, setRows] = useState<Row[]>(() =>
     transactions.map((tx) => ({ tx, included: true }))
   );
   const [spreadsheet, setSpreadsheet] = useState<File | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [error, setError] = useState("");
+  const [confirmResult, setConfirmResult] = useState<ConfirmResult | null>(null);
+
+  // "Add another statement" state
+  const addFileRef = useRef<HTMLInputElement>(null);
+  const [addCreditCard, setAddCreditCard] = useState(false);
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState("");
+
+  // Append new transactions when parent adds more statements
+  const rowCountRef = useRef(transactions.length);
+  useEffect(() => {
+    if (transactions.length > rowCountRef.current) {
+      const newTxs = transactions.slice(rowCountRef.current);
+      setRows((prev) => [...prev, ...newTxs.map((tx) => ({ tx, included: true }))]);
+      rowCountRef.current = transactions.length;
+    }
+  }, [transactions]);
 
   const approvedCount = rows.filter((r) => r.included).length;
   const allIncluded = rows.every((r) => r.included);
@@ -39,11 +58,27 @@ export default function ReviewTable({ transactions, onDone }: Props) {
     );
   }
 
-  async function handleWrite() {
-    if (!spreadsheet) {
-      setError("Select your spreadsheet file before writing.");
-      return;
+  async function handleAddFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAddLoading(true);
+    setAddError("");
+    try {
+      const result = await uploadStatement(file, addCreditCard);
+      if (result.transactions.length === 0) {
+        setAddError("No transactions found in that file.");
+        return;
+      }
+      onAddMore(result);
+    } catch (e: unknown) {
+      setAddError(e instanceof Error ? e.message : "Failed to parse statement");
+    } finally {
+      setAddLoading(false);
+      if (addFileRef.current) addFileRef.current.value = "";
     }
+  }
+
+  async function handleWrite() {
     const approved = rows.filter((r) => r.included).map((r) => r.tx);
     if (approved.length === 0) {
       setError("No transactions selected.");
@@ -52,8 +87,8 @@ export default function ReviewTable({ transactions, onDone }: Props) {
     setStatus("loading");
     setError("");
     try {
-      const blob = await confirmTransactions(approved, spreadsheet);
-      downloadBlob(blob, "FinanceFlow_updated.xlsx");
+      const result = await confirmTransactions(approved, spreadsheet);
+      setConfirmResult(result);
       setStatus("done");
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to write transactions");
@@ -62,13 +97,33 @@ export default function ReviewTable({ transactions, onDone }: Props) {
   }
 
   if (status === "done") {
+    let message: React.ReactNode;
+    if (confirmResult?.kind === "downloaded") {
+      message = (
+        <>
+          Your updated spreadsheet downloaded as <strong>FinanceFlow_updated.xlsx</strong>.
+          Replace your original file with it. It's also saved in your data folder for future imports.
+        </>
+      );
+    } else if (confirmResult?.kind === "written" && confirmResult.status === "created") {
+      message = (
+        <>
+          A new <strong>FinanceFlow.xlsx</strong> was created in your data folder with your
+          transactions. Future imports will write to it automatically — no file picker needed.
+        </>
+      );
+    } else {
+      message = (
+        <>
+          Your transactions were written to <strong>FinanceFlow.xlsx</strong> in your data folder.
+        </>
+      );
+    }
+
     return (
       <div className="rounded-lg bg-emerald-50 px-4 py-4 text-sm text-emerald-700">
         <p className="font-medium">✓ Transactions written successfully.</p>
-        <p className="mt-1 text-emerald-600">
-          Your updated spreadsheet downloaded as <strong>FinanceFlow_updated.xlsx</strong>.
-          Replace your original file with it.
-        </p>
+        <p className="mt-1 text-emerald-600">{message}</p>
         <button
           type="button"
           onClick={onDone}
@@ -82,6 +137,51 @@ export default function ReviewTable({ transactions, onDone }: Props) {
 
   return (
     <div>
+      {/* Add another statement */}
+      <div className="mb-4 rounded-lg border border-dashed border-gray-300 p-3">
+        <p className="mb-2 text-xs font-medium text-gray-600">Add another statement</p>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex gap-3">
+            <label className="flex cursor-pointer items-center gap-1.5 text-xs text-gray-600">
+              <input
+                type="radio"
+                name="addStatementType"
+                checked={!addCreditCard}
+                onChange={() => setAddCreditCard(false)}
+                className="accent-emerald-600"
+              />
+              Bank
+            </label>
+            <label className="flex cursor-pointer items-center gap-1.5 text-xs text-gray-600">
+              <input
+                type="radio"
+                name="addStatementType"
+                checked={addCreditCard}
+                onChange={() => setAddCreditCard(true)}
+                className="accent-emerald-600"
+              />
+              Credit card
+            </label>
+          </div>
+          <input
+            ref={addFileRef}
+            type="file"
+            accept=".pdf,.csv"
+            className="hidden"
+            onChange={handleAddFile}
+          />
+          <button
+            type="button"
+            disabled={addLoading}
+            onClick={() => addFileRef.current?.click()}
+            className="rounded border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:border-emerald-400 hover:bg-emerald-50 disabled:opacity-50"
+          >
+            {addLoading ? "Parsing…" : "+ Add file"}
+          </button>
+          {addError && <p className="text-xs text-red-600">{addError}</p>}
+        </div>
+      </div>
+
       <div className="mb-3 flex items-center justify-between">
         <p className="text-sm text-gray-600">
           <span className="font-medium">{approvedCount}</span> of{" "}
@@ -141,31 +241,51 @@ export default function ReviewTable({ transactions, onDone }: Props) {
       </div>
 
       <div className="mt-4 rounded-lg border border-gray-200 p-4">
-        <p className="mb-2 text-sm font-medium text-gray-800">Write to your spreadsheet</p>
-        <p className="mb-3 text-xs text-gray-500">
-          Select your .xlsx file — transactions are written to it and downloaded back.
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:border-emerald-400 hover:bg-emerald-50">
-            <input
-              type="file"
-              accept=".xlsx"
-              className="hidden"
-              onChange={(e) => setSpreadsheet(e.target.files?.[0] ?? null)}
-            />
-            {spreadsheet ? spreadsheet.name : "Select spreadsheet (.xlsx)"}
-          </label>
-          <button
-            type="button"
-            onClick={handleWrite}
-            disabled={status === "loading" || !spreadsheet}
-            className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
-          >
-            {status === "loading"
-              ? "Writing…"
-              : `Write ${approvedCount} transaction${approvedCount !== 1 ? "s" : ""} to spreadsheet`}
-          </button>
-        </div>
+        {hasVolumeFile ? (
+          <>
+            <p className="mb-3 text-sm font-medium text-gray-800">
+              Write to <span className="font-mono text-emerald-700">FinanceFlow.xlsx</span>
+            </p>
+            <button
+              type="button"
+              onClick={handleWrite}
+              disabled={status === "loading"}
+              className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+            >
+              {status === "loading"
+                ? "Writing…"
+                : `Export ${approvedCount} transaction${approvedCount !== 1 ? "s" : ""} to FinanceFlow.xlsx`}
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="mb-2 text-sm font-medium text-gray-800">Write to your spreadsheet</p>
+            <p className="mb-3 text-xs text-gray-500">
+              Select your .xlsx file, or leave blank to create a new FinanceFlow spreadsheet automatically.
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:border-emerald-400 hover:bg-emerald-50">
+                <input
+                  type="file"
+                  accept=".xlsx"
+                  className="hidden"
+                  onChange={(e) => setSpreadsheet(e.target.files?.[0] ?? null)}
+                />
+                {spreadsheet ? spreadsheet.name : "Select spreadsheet (.xlsx) — optional"}
+              </label>
+              <button
+                type="button"
+                onClick={handleWrite}
+                disabled={status === "loading"}
+                className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+              >
+                {status === "loading"
+                  ? "Writing…"
+                  : `Export ${approvedCount} transaction${approvedCount !== 1 ? "s" : ""} to spreadsheet`}
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       {error && (
