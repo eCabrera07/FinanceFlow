@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CreateSpreadsheetButton from "@/components/spreadsheet/CreateSpreadsheetButton";
 import ImportWizard from "@/components/spreadsheet/ImportWizard";
 import UploadArea from "@/components/statement/UploadArea";
 import ReviewTable from "@/components/statement/ReviewTable";
-import type { UploadResponse } from "@/lib/types/statement";
+import { getSpreadsheetStatus } from "@/lib/api/spreadsheet";
+import type { Transaction, UploadResponse } from "@/lib/types/statement";
 
 type StatementState = "idle" | "reviewing";
 
@@ -12,7 +13,20 @@ export default function HomePage() {
   const [showWizard, setShowWizard] = useState(false);
   const [mappingSet, setMappingSet] = useState(false);
   const [statementState, setStatementState] = useState<StatementState>("idle");
-  const [uploadResult, setUploadResult] = useState<UploadResponse | null>(null);
+  const [accumulatedTransactions, setAccumulatedTransactions] = useState<Transaction[]>([]);
+  const [hasVolumeFile, setHasVolumeFile] = useState(false);
+
+  useEffect(() => {
+    getSpreadsheetStatus()
+      .then((s) => setHasVolumeFile(s.has_volume_file))
+      .catch(() => {});
+  }, []);
+
+  function refreshVolumeStatus() {
+    getSpreadsheetStatus()
+      .then((s) => setHasVolumeFile(s.has_volume_file))
+      .catch(() => {});
+  }
 
   function handleWizardComplete() {
     setMappingSet(true);
@@ -20,13 +34,14 @@ export default function HomePage() {
   }
 
   function handleUploaded(result: UploadResponse) {
-    setUploadResult(result);
+    setAccumulatedTransactions((prev) => [...prev, ...result.transactions]);
     setStatementState("reviewing");
   }
 
   function handleReviewDone() {
     setStatementState("idle");
-    setUploadResult(null);
+    setAccumulatedTransactions([]);
+    refreshVolumeStatus();
   }
 
   return (
@@ -71,9 +86,11 @@ export default function HomePage() {
           <UploadArea onUploaded={handleUploaded} />
         )}
 
-        {statementState === "reviewing" && uploadResult && (
+        {statementState === "reviewing" && (
           <ReviewTable
-            transactions={uploadResult.transactions}
+            transactions={accumulatedTransactions}
+            hasVolumeFile={hasVolumeFile}
+            onAddMore={handleUploaded}
             onDone={handleReviewDone}
           />
         )}
